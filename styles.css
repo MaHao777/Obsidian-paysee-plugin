@@ -1,0 +1,208 @@
+/* ============================================================
+   PaySee – Obsidian 账单可视化插件样式
+   ============================================================ */
+
+/* ── 侧边栏容器 ── */
+.paysee-view-container {
+    padding: 12px;
+    overflow-y: auto;
+}
+
+/* ── 月份导航 ── */
+.paysee-month-nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.paysee-nav-btn {
+    background: var(--interactive-normal);
+    border: 1px solid var(--background-modifier-border);
+    border-radius: 4px;
+    color: var(--text-normal);
+    cursor: pointer;
+    padding: 4px 10px;
+    font-size: 14px;
+    transition: background 0.15s;
+}
+
+.paysee-nav-btn:hover {
+    background: var(--interactive-hover);
+}
+
+.paysee-month-label {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-normal);
+    min-width: 100px;
+    text-align: center;
+}
+
+/* ── 统计摘要卡片 ── */
+.paysee-summary {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.paysee-card {
+    background: var(--background-secondary);
+    border-radius: 8px;
+    padding: 10px 8px;
+    text-align: center;
+}
+
+.paysee-card-label {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+}
+
+.paysee-card-value {
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.paysee-income-card .paysee-card-value {
+    color: #2ecc71;
+}
+
+.paysee-expense-card .paysee-card-value {
+    color: #e74c3c;
+}
+
+.paysee-balance-card .paysee-card-value {
+    color: var(--text-normal);
+}
+
+/* ── 图表区域 ── */
+.paysee-chart-section {
+    margin-bottom: 20px;
+}
+
+.paysee-chart-section h4 {
+    font-size: 14px;
+    margin: 0 0 8px;
+    color: var(--text-normal);
+}
+
+.paysee-chart-container {
+    background: var(--background-secondary);
+    border-radius: 8px;
+    padding: 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.paysee-chart-container canvas {
+    max-width: 100%;
+    height: auto !important;
+}
+
+/* ── 账单列表 ── */
+.paysee-list-section {
+    margin-bottom: 12px;
+}
+
+.paysee-list-section h4 {
+    font-size: 14px;
+    margin: 0 0 8px;
+    color: var(--text-normal);
+}
+
+.paysee-empty {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 13px;
+    padding: 20px 0;
+}
+
+.paysee-bill-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.paysee-bill-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 10px;
+    border-radius: 6px;
+    background: var(--background-secondary);
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.paysee-bill-item:hover {
+    background: var(--background-modifier-hover);
+}
+
+.paysee-bill-left {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    overflow: hidden;
+}
+
+.paysee-bill-category {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-normal);
+}
+
+.paysee-bill-date {
+    font-size: 11px;
+    color: var(--text-muted);
+}
+
+.paysee-bill-note {
+    font-size: 11px;
+    color: var(--text-faint);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 180px;
+}
+
+.paysee-bill-right {
+    flex-shrink: 0;
+    margin-left: 8px;
+}
+
+.paysee-amount-expense {
+    color: #e74c3c;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.paysee-amount-income {
+    color: #2ecc71;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+/* ── Modal（记账弹窗） ── */
+.paysee-modal .setting-item {
+    border-top: none;
+    padding: 8px 0;
+}
+
+.paysee-modal h2 {
+    margin-top: 0;
+    margin-bottom: 12px;
+}
+
+/* ── 设置面板 分类列表 ── */
+.paysee-categories-list .setting-item {
+    border-top: none;
+    padding: 4px 0;
+}
+
+.paysee-categories-list .setting-item-name {
+    font-size: 13px;
+}

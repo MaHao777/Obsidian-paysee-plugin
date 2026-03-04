@@ -1,0 +1,17 @@
+# Dependencies
+node_modules/
+
+# Build output
+main.js
+
+# IDE
+.vscode/
+*.code-workspace
+
+# OS
+Thumbs.db
+.DS_Store
+
+# npm
+npm-debug.log*
+package-lock.json

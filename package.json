@@ -1,0 +1,22 @@
+{
+  "name": "obs-paysee",
+  "version": "1.0.0",
+  "description": "Obsidian plugin for visual bill tracking and viewing",
+  "main": "main.js",
+  "scripts": {
+    "dev": "node esbuild.config.mjs",
+    "build": "node esbuild.config.mjs production"
+  },
+  "keywords": ["obsidian", "plugin", "bill", "expense", "finance"],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "esbuild": "^0.20.0",
+    "obsidian": "^1.5.0",
+    "typescript": "^5.3.0"
+  },
+  "dependencies": {
+    "chart.js": "^4.4.0"
+  }
+}

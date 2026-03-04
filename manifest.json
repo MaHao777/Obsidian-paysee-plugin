@@ -1,0 +1,9 @@
+{
+  "id": "obs-paysee",
+  "name": "PaySee",
+  "version": "1.0.0",
+  "minAppVersion": "1.5.0",
+  "description": "可视化记录和查看账单的 Obsidian 插件",
+  "author": "",
+  "isDesktopOnly": false
+}
