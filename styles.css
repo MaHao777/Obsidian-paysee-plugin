@@ -1,14 +1,17 @@
 /* ============================================================
-   PaySee – Obsidian 账单可视化插件样式
+   PaySee - Obsidian bill visualization plugin styles
    ============================================================ */
 
-/* ── 侧边栏容器 ── */
+/* Sidebar container */
 .paysee-view-container {
     padding: 12px;
     overflow-y: auto;
+
+    --paysee-color-income: var(--color-green);
+    --paysee-color-expense: var(--color-red);
 }
 
-/* ── 月份导航 ── */
+/* Month navigation */
 .paysee-month-nav {
     display: flex;
     align-items: center;
@@ -40,7 +43,7 @@
     text-align: center;
 }
 
-/* ── 统计摘要卡片 ── */
+/* Summary cards */
 .paysee-summary {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
@@ -67,18 +70,18 @@
 }
 
 .paysee-income-card .paysee-card-value {
-    color: #2ecc71;
+    color: var(--paysee-color-income);
 }
 
 .paysee-expense-card .paysee-card-value {
-    color: #e74c3c;
+    color: var(--paysee-color-expense);
 }
 
 .paysee-balance-card .paysee-card-value {
     color: var(--text-normal);
 }
 
-/* ── 图表区域 ── */
+/* Chart area */
 .paysee-chart-section {
     margin-bottom: 20px;
 }
@@ -103,7 +106,7 @@
     height: auto !important;
 }
 
-/* ── 账单列表 ── */
+/* Bill list */
 .paysee-list-section {
     margin-bottom: 12px;
 }
@@ -175,18 +178,18 @@
 }
 
 .paysee-amount-expense {
-    color: #e74c3c;
+    color: var(--paysee-color-expense);
     font-weight: 600;
     font-size: 14px;
 }
 
 .paysee-amount-income {
-    color: #2ecc71;
+    color: var(--paysee-color-income);
     font-weight: 600;
     font-size: 14px;
 }
 
-/* ── Modal（记账弹窗） ── */
+/* Modal */
 .paysee-modal .setting-item {
     border-top: none;
     padding: 8px 0;
@@ -197,7 +200,7 @@
     margin-bottom: 12px;
 }
 
-/* ── 设置面板 分类列表 ── */
+/* Settings category list */
 .paysee-categories-list .setting-item {
     border-top: none;
     padding: 4px 0;

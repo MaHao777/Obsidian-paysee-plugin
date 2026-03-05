@@ -1,15 +1,61 @@
-import { Chart, ArcElement, BarElement, BarController, DoughnutController, CategoryScale, LinearScale, Tooltip, Legend } from "chart.js";
+import {
+    Chart,
+    ArcElement,
+    BarElement,
+    BarController,
+    DoughnutController,
+    CategoryScale,
+    LinearScale,
+    Tooltip,
+    Legend,
+} from "chart.js";
 import { CATEGORY_COLORS, EXTRA_COLORS } from "./constants";
 
-// 注册使用到的 chart.js 组件
-Chart.register(ArcElement, BarElement, BarController, DoughnutController, CategoryScale, LinearScale, Tooltip, Legend);
+// Register the Chart.js components used by this plugin.
+Chart.register(
+    ArcElement,
+    BarElement,
+    BarController,
+    DoughnutController,
+    CategoryScale,
+    LinearScale,
+    Tooltip,
+    Legend
+);
+
+type ChartThemeColors = {
+    textNormal: string;
+    textMuted: string;
+    border: string;
+    backgroundPrimary: string;
+    income: string;
+    expense: string;
+};
+
+// Chart.js canvas rendering cannot resolve CSS var(...) directly.
+function readCssVar(name: string, fallback: string): string {
+    if (typeof window === "undefined") return fallback;
+    const value = getComputedStyle(document.body).getPropertyValue(name).trim();
+    return value || fallback;
+}
+
+function getChartThemeColors(): ChartThemeColors {
+    return {
+        textNormal: readCssVar("--text-normal", "#222222"),
+        textMuted: readCssVar("--text-muted", "#666666"),
+        border: readCssVar("--background-modifier-border", "rgba(0, 0, 0, 0.15)"),
+        backgroundPrimary: readCssVar("--background-primary", "#ffffff"),
+        income: readCssVar("--color-green", "#2ecc71"),
+        expense: readCssVar("--color-red", "#e74c3c"),
+    };
+}
 
 /** 获取分类颜色，未知分类走备用色板 */
 function getCategoryColor(category: string, index: number): string {
     return CATEGORY_COLORS[category] || EXTRA_COLORS[index % EXTRA_COLORS.length];
 }
 
-/** 环形图：按分类展示支出占比 */
+/** 饼图：按分类展示支出占比 */
 export function renderPieChart(
     container: HTMLElement,
     data: Map<string, number>,
@@ -24,6 +70,7 @@ export function renderPieChart(
     const labels = Array.from(data.keys());
     const values = Array.from(data.values());
     const colors = labels.map((label, i) => getCategoryColor(label, i));
+    const themeColors = getChartThemeColors();
 
     return new Chart(canvas, {
         type: "doughnut",
@@ -34,7 +81,7 @@ export function renderPieChart(
                     data: values,
                     backgroundColor: colors,
                     borderWidth: 2,
-                    borderColor: "var(--background-primary)",
+                    borderColor: themeColors.backgroundPrimary,
                 },
             ],
         },
@@ -45,12 +92,16 @@ export function renderPieChart(
                 legend: {
                     position: "bottom",
                     labels: {
-                        color: "var(--text-normal)",
+                        color: themeColors.textNormal,
                         padding: 12,
                         font: { size: 12 },
                     },
                 },
                 tooltip: {
+                    titleColor: themeColors.textNormal,
+                    bodyColor: themeColors.textNormal,
+                    borderColor: themeColors.border,
+                    borderWidth: 1,
                     callbacks: {
                         label(ctx) {
                             const val = ctx.parsed;
@@ -78,9 +129,7 @@ export function renderBarChart(
     canvas.height = 200;
 
     // 按日期排序
-    const sortedEntries = Array.from(data.entries()).sort(([a], [b]) =>
-        a.localeCompare(b)
-    );
+    const sortedEntries = Array.from(data.entries()).sort(([a], [b]) => a.localeCompare(b));
     const labels = sortedEntries.map(([d]) => {
         // 只显示日部分 MM-DD
         const parts = d.split("-");
@@ -88,6 +137,7 @@ export function renderBarChart(
     });
     const incomeData = sortedEntries.map(([, v]) => v.income);
     const expenseData = sortedEntries.map(([, v]) => v.expense);
+    const themeColors = getChartThemeColors();
 
     return new Chart(canvas, {
         type: "bar",
@@ -97,15 +147,15 @@ export function renderBarChart(
                 {
                     label: "收入",
                     data: incomeData,
-                    backgroundColor: "rgba(46, 204, 113, 0.7)",
-                    borderColor: "rgba(46, 204, 113, 1)",
+                    backgroundColor: themeColors.income,
+                    borderColor: themeColors.income,
                     borderWidth: 1,
                 },
                 {
                     label: "支出",
                     data: expenseData,
-                    backgroundColor: "rgba(231, 76, 60, 0.7)",
-                    borderColor: "rgba(231, 76, 60, 1)",
+                    backgroundColor: themeColors.expense,
+                    borderColor: themeColors.expense,
                     borderWidth: 1,
                 },
             ],
@@ -115,28 +165,32 @@ export function renderBarChart(
             maintainAspectRatio: true,
             scales: {
                 x: {
-                    ticks: { color: "var(--text-muted)" },
-                    grid: { color: "var(--background-modifier-border)" },
+                    ticks: { color: themeColors.textMuted },
+                    grid: { color: themeColors.border },
                 },
                 y: {
                     beginAtZero: true,
                     ticks: {
-                        color: "var(--text-muted)",
+                        color: themeColors.textMuted,
                         callback(value) {
                             return currency + value;
                         },
                     },
-                    grid: { color: "var(--background-modifier-border)" },
+                    grid: { color: themeColors.border },
                 },
             },
             plugins: {
                 legend: {
                     labels: {
-                        color: "var(--text-normal)",
+                        color: themeColors.textNormal,
                         font: { size: 12 },
                     },
                 },
                 tooltip: {
+                    titleColor: themeColors.textNormal,
+                    bodyColor: themeColors.textNormal,
+                    borderColor: themeColors.border,
+                    borderWidth: 1,
                     callbacks: {
                         label(ctx) {
                             return ` ${ctx.dataset.label}: ${currency}${(ctx.parsed.y ?? 0).toFixed(2)}`;
