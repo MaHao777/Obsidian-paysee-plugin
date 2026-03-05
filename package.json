@@ -1,6 +1,6 @@
 {
   "name": "obs-paysee",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Obsidian plugin for visual bill tracking and viewing",
   "main": "main.js",
   "scripts": {

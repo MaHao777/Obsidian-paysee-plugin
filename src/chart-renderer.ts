@@ -50,12 +50,10 @@ function getChartThemeColors(): ChartThemeColors {
     };
 }
 
-/** 获取分类颜色，未知分类走备用色板 */
 function getCategoryColor(category: string, index: number): string {
     return CATEGORY_COLORS[category] || EXTRA_COLORS[index % EXTRA_COLORS.length];
 }
 
-/** 饼图：按分类展示支出占比 */
 export function renderPieChart(
     container: HTMLElement,
     data: Map<string, number>,
@@ -71,6 +69,8 @@ export function renderPieChart(
     const values = Array.from(data.values());
     const colors = labels.map((label, i) => getCategoryColor(label, i));
     const themeColors = getChartThemeColors();
+    // Full-circle single-slice doughnut can jitter when hover offset is applied.
+    const hoverOffset = labels.length > 1 ? 6 : 0;
 
     return new Chart(canvas, {
         type: "doughnut",
@@ -82,12 +82,29 @@ export function renderPieChart(
                     backgroundColor: colors,
                     borderWidth: 2,
                     borderColor: themeColors.backgroundPrimary,
+                    hoverOffset,
                 },
             ],
         },
         options: {
             responsive: true,
             maintainAspectRatio: true,
+            interaction: {
+                mode: "nearest",
+                intersect: true,
+            },
+            // Keep room to prevent hover grow from forcing relayout.
+            layout: {
+                padding: 6,
+            },
+            // Disable active-state tweening to avoid subtle hover jitter.
+            transitions: {
+                active: {
+                    animation: {
+                        duration: 0,
+                    },
+                },
+            },
             plugins: {
                 legend: {
                     position: "bottom",
@@ -116,7 +133,6 @@ export function renderPieChart(
     });
 }
 
-/** 柱状图：按日展示收支对比 */
 export function renderBarChart(
     container: HTMLElement,
     data: Map<string, { income: number; expense: number }>,
@@ -128,10 +144,8 @@ export function renderBarChart(
     canvas.width = 300;
     canvas.height = 200;
 
-    // 按日期排序
     const sortedEntries = Array.from(data.entries()).sort(([a], [b]) => a.localeCompare(b));
     const labels = sortedEntries.map(([d]) => {
-        // 只显示日部分 MM-DD
         const parts = d.split("-");
         return parts.length >= 3 ? `${parts[1]}-${parts[2]}` : d;
     });
@@ -145,14 +159,14 @@ export function renderBarChart(
             labels,
             datasets: [
                 {
-                    label: "收入",
+                    label: "\u6536\u5165",
                     data: incomeData,
                     backgroundColor: themeColors.income,
                     borderColor: themeColors.income,
                     borderWidth: 1,
                 },
                 {
-                    label: "支出",
+                    label: "\u652f\u51fa",
                     data: expenseData,
                     backgroundColor: themeColors.expense,
                     borderColor: themeColors.expense,
@@ -202,7 +216,6 @@ export function renderBarChart(
     });
 }
 
-/** 销毁 chart 实例 */
 export function destroyChart(chart: Chart | null): void {
     if (chart) {
         chart.destroy();
