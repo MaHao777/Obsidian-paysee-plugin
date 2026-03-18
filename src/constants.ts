@@ -39,4 +39,5 @@ export const EXTRA_COLORS = [
 ];
 
 export const DEFAULT_BILL_FOLDER = "PaySee";
+export const DEFAULT_AMOUNT_THRESHOLDS = [100, 500];
 export const DEFAULT_CURRENCY = "¥";

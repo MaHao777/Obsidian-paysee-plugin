@@ -1,4 +1,5 @@
 export type BillType = "income" | "expense";
+export type BillSortMode = "date-desc" | "amount-desc";
 
 export interface BillEntry {
     /** 唯一 ID */
@@ -40,6 +41,7 @@ export interface PaySeeSettings {
     categories: string[];
     /** 货币符号 */
     currency: string;
+    amountThresholds: number[];
     /** 存储版本 */
     storageVersion: number;
     /** 旧数据迁移完成时间 */

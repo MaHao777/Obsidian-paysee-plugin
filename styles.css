@@ -43,6 +43,63 @@
     text-align: center;
 }
 
+/* Filters */
+.paysee-filter-bar {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.paysee-filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.paysee-filter-label {
+    font-size: 11px;
+    color: var(--text-muted);
+}
+
+.paysee-filter-trigger {
+    width: 100%;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    background: var(--background-secondary);
+    border: 1px solid var(--background-modifier-border);
+    border-radius: 6px;
+    color: var(--text-normal);
+    padding: 6px 8px;
+    cursor: pointer;
+    text-align: left;
+}
+
+.paysee-filter-trigger:hover {
+    background: var(--background-modifier-hover);
+}
+
+.paysee-filter-trigger:focus {
+    outline: none;
+    border-color: var(--interactive-accent);
+    box-shadow: 0 0 0 1px var(--interactive-accent-hover);
+}
+
+.paysee-filter-trigger-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.paysee-filter-trigger-icon {
+    flex-shrink: 0;
+    color: var(--text-muted);
+    font-size: 10px;
+}
+
 /* Summary cards */
 .paysee-summary {
     display: grid;
@@ -182,10 +239,30 @@
     overflow: hidden;
 }
 
+.paysee-bill-meta {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+}
+
 .paysee-bill-category {
     font-size: 13px;
     font-weight: 600;
     color: var(--text-normal);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.paysee-bill-bucket-badge {
+    flex-shrink: 0;
+    padding: 1px 6px;
+    border-radius: 999px;
+    background: var(--background-modifier-border);
+    color: var(--text-muted);
+    font-size: 10px;
+    line-height: 1.5;
 }
 
 .paysee-bill-date {
@@ -238,4 +315,34 @@
 
 .paysee-categories-list .setting-item-name {
     font-size: 13px;
+}
+
+.paysee-settings-hint {
+    margin: 0 0 8px;
+    color: var(--text-muted);
+    font-size: 12px;
+}
+
+.paysee-threshold-preview {
+    margin-bottom: 8px;
+}
+
+.paysee-threshold-preview-label {
+    margin-bottom: 6px;
+    color: var(--text-muted);
+    font-size: 12px;
+}
+
+.paysee-threshold-preview-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.paysee-threshold-chip {
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: var(--background-secondary);
+    color: var(--text-normal);
+    font-size: 11px;
 }

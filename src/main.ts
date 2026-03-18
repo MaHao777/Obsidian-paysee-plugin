@@ -5,6 +5,7 @@ import { PaySeeView } from "./bill-view";
 import { BillModal } from "./bill-modal";
 import { PaySeeSettingTab, DEFAULT_SETTINGS } from "./settings";
 import { BillStorage } from "./bill-storage";
+import { normalizeAmountThresholds } from "./bill-parser";
 
 export default class PaySeePlugin extends Plugin {
     settings: PaySeeSettings = DEFAULT_SETTINGS;
@@ -71,6 +72,11 @@ export default class PaySeePlugin extends Plugin {
             this.settings.categories = [...DEFAULT_SETTINGS.categories];
         }
 
+        this.settings.amountThresholds = normalizeAmountThresholds(
+            loaded?.amountThresholds,
+            DEFAULT_SETTINGS.amountThresholds
+        );
+
         this.settings.storageVersion =
             typeof loaded?.storageVersion === "number" ? loaded.storageVersion : 1;
 
@@ -82,6 +88,10 @@ export default class PaySeePlugin extends Plugin {
     }
 
     async saveSettings(): Promise<void> {
+        this.settings.amountThresholds = normalizeAmountThresholds(
+            this.settings.amountThresholds,
+            DEFAULT_SETTINGS.amountThresholds
+        );
         await this.saveData(this.settings);
         this.app.workspace.getLeavesOfType(VIEW_TYPE_PAYSEE).forEach((leaf) => {
             if (leaf.view instanceof PaySeeView) {
