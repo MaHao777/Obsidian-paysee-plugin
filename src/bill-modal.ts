@@ -6,12 +6,17 @@ export class BillModal extends Modal {
     private readonly storage: IBillStorage;
     private readonly onSave: () => Promise<void>;
     private readonly bill?: BillEntry;
+    private dateInputEl: HTMLInputElement | null = null;
+    private readonly navigableFields: Array<
+        HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    > = [];
 
     private date: string;
     private amount = "";
     private billType: BillType = "expense";
     private category: string;
     private note = "";
+    private isSubmitting = false;
 
     constructor(
         app: App,
@@ -37,29 +42,33 @@ export class BillModal extends Modal {
         const { contentEl } = this;
         contentEl.empty();
         contentEl.addClass("paysee-modal");
+        this.dateInputEl = null;
+        this.navigableFields.length = 0;
+        contentEl.addEventListener("keydown", this.handleKeydown);
 
         contentEl.createEl("h2", { text: this.bill ? "Edit Bill" : "New Bill" });
 
         new Setting(contentEl)
             .setName("Date")
-            .addText((text) =>
-                text
-                    .setValue(this.date)
-                    .setPlaceholder("YYYY-MM-DD")
-                    .onChange((value) => {
-                        this.date = value;
-                    })
-            );
+            .addText((text) => {
+                text.inputEl.type = "date";
+                text.setValue(this.date).onChange((value) => {
+                    this.date = value;
+                });
+                this.dateInputEl = text.inputEl;
+                this.registerNavigableField(text.inputEl);
+            });
 
-        new Setting(contentEl).setName("Type").addDropdown((dropdown) =>
+        new Setting(contentEl).setName("Type").addDropdown((dropdown) => {
             dropdown
                 .addOption("expense", "Expense")
                 .addOption("income", "Income")
                 .setValue(this.billType)
                 .onChange((value) => {
                     this.billType = value as BillType;
-                })
-        );
+                });
+            this.registerNavigableField(dropdown.selectEl);
+        });
 
         new Setting(contentEl)
             .setName("Amount")
@@ -70,6 +79,7 @@ export class BillModal extends Modal {
                 text.inputEl.type = "number";
                 text.inputEl.step = "0.01";
                 text.inputEl.min = "0";
+                this.registerNavigableField(text.inputEl);
             });
 
         new Setting(contentEl).setName("Category").addDropdown((dropdown) => {
@@ -81,6 +91,7 @@ export class BillModal extends Modal {
             dropdown.onChange((value) => {
                 this.category = value;
             });
+            this.registerNavigableField(dropdown.selectEl);
         });
 
         new Setting(contentEl)
@@ -90,6 +101,7 @@ export class BillModal extends Modal {
                     this.note = value;
                 });
                 textarea.inputEl.rows = 4;
+                this.registerNavigableField(textarea.inputEl);
             });
 
         const actions = new Setting(contentEl);
@@ -111,6 +123,9 @@ export class BillModal extends Modal {
     }
 
     onClose(): void {
+        this.contentEl.removeEventListener("keydown", this.handleKeydown);
+        this.dateInputEl = null;
+        this.navigableFields.length = 0;
         this.contentEl.empty();
     }
 
@@ -147,11 +162,139 @@ export class BillModal extends Modal {
         };
     }
 
+    private registerNavigableField(
+        field: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    ): void {
+        if (this.bill) {
+            return;
+        }
+
+        this.navigableFields.push(field);
+    }
+
+    private handleKeydown = (event: KeyboardEvent): void => {
+        if (this.bill || event.isComposing || event.keyCode === 229) {
+            return;
+        }
+
+        const target = event.target;
+        if (!(target instanceof HTMLElement)) {
+            return;
+        }
+
+        if (target === this.dateInputEl && (event.key === "ArrowLeft" || event.key === "ArrowRight")) {
+            if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) {
+                return;
+            }
+
+            if (!this.shiftDateByDays(event.key === "ArrowRight" ? 1 : -1)) {
+                return;
+            }
+
+            event.preventDefault();
+            return;
+        }
+
+        if (event.key === "ArrowUp" || event.key === "ArrowDown") {
+            if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) {
+                return;
+            }
+
+            if (
+                target instanceof HTMLTextAreaElement &&
+                !this.shouldMoveFocusFromTextarea(target, event.key)
+            ) {
+                return;
+            }
+
+            if (!this.moveFocus(target, event.key === "ArrowDown" ? 1 : -1)) {
+                return;
+            }
+
+            event.preventDefault();
+            return;
+        }
+
+        if (event.key !== "Enter") {
+            return;
+        }
+
+        if (
+            target instanceof HTMLTextAreaElement &&
+            (event.shiftKey || event.altKey || event.ctrlKey || event.metaKey)
+        ) {
+            return;
+        }
+
+        event.preventDefault();
+        void this.submitBill();
+    };
+
+    private moveFocus(target: HTMLElement, direction: -1 | 1): boolean {
+        const currentIndex = this.navigableFields.findIndex(
+            (field) => field === target || field.contains(target)
+        );
+        if (currentIndex === -1) {
+            return false;
+        }
+
+        const nextIndex = Math.max(
+            0,
+            Math.min(this.navigableFields.length - 1, currentIndex + direction)
+        );
+        if (nextIndex === currentIndex) {
+            return false;
+        }
+
+        this.navigableFields[nextIndex].focus();
+        return true;
+    }
+
+    private shouldMoveFocusFromTextarea(
+        textarea: HTMLTextAreaElement,
+        key: "ArrowUp" | "ArrowDown"
+    ): boolean {
+        if (textarea.selectionStart !== textarea.selectionEnd) {
+            return false;
+        }
+
+        const value = textarea.value;
+        const caret = textarea.selectionStart;
+        if (key === "ArrowUp") {
+            return value.lastIndexOf("\n", Math.max(0, caret - 1)) === -1;
+        }
+
+        return value.indexOf("\n", caret) === -1;
+    }
+
+    private shiftDateByDays(days: number): boolean {
+        const currentDate = this.dateInputEl?.value || this.date;
+        const parsed = moment(currentDate, "YYYY-MM-DD", true);
+        if (!parsed.isValid()) {
+            return false;
+        }
+
+        const nextDate = parsed.add(days, "day").format("YYYY-MM-DD");
+        this.date = nextDate;
+
+        if (this.dateInputEl) {
+            this.dateInputEl.value = nextDate;
+        }
+
+        return true;
+    }
+
     private async submitBill(): Promise<void> {
+        if (this.isSubmitting) {
+            return;
+        }
+
         const input = this.buildInput();
         if (!input) {
             return;
         }
+
+        this.isSubmitting = true;
 
         try {
             if (this.bill) {
@@ -166,6 +309,8 @@ export class BillModal extends Modal {
             this.close();
         } catch (error) {
             new Notice(`Save failed: ${(error as Error).message}`);
+        } finally {
+            this.isSubmitting = false;
         }
     }
 

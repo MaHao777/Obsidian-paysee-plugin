@@ -1,68 +1,98 @@
-# PaySee — Obsidian 账单可视化插件
+# PaySee
 
-可视化记录和查看账单的 Obsidian 插件。每条账单以独立 Markdown 笔记形式存储，通过 frontmatter 记录结构化数据，侧边栏面板提供图表统计和账单列表。
+PaySee is an Obsidian plugin for recording bills and reviewing monthly income and expense data in a side panel.
 
-## 功能
+It now stores bills in plugin-private monthly JSON files instead of creating one Markdown note per bill.
 
-- **快速记账**：通过命令面板 (`Ctrl+P` → "记一笔账") 或 ribbon 图标打开记账弹窗
-- **侧边栏面板**：月度收支摘要、支出分类环形图、每日收支柱状图、账单明细列表
-- **月份切换**：在侧边栏中快速浏览不同月份的数据
-- **分类管理**：预设常用分类（餐饮、交通、购物等），支持自定义增删和排序
-- **自动刷新**：新增/修改/删除账单笔记后面板自动更新
-- **点击跳转**：账单列表中点击可直接打开对应笔记
-- **明暗主题适配**：样式跟随 Obsidian 主题切换
+## Features
 
-## 账单格式
+- Fast bill entry from a command or ribbon action
+- Monthly dashboard with income, expense, balance, pie chart, and daily bar chart
+- In-plugin bill editing and deletion
+- Category management in plugin settings
+- Automatic migration from legacy Markdown bill files
+- Mobile-safe storage approach with no SQLite dependency
 
-每条账单是一个 Markdown 文件，存储在设置中配置的目录下（默认 `PaySee/`）：
+## Quick Start
 
-```markdown
----
-date: 2026-03-04
-amount: 35.5
-category: 餐饮
-type: expense
----
-午餐外卖
+If you want to install the plugin manually, copy these three files:
+
+- `main.js`
+- `manifest.json`
+- `styles.css`
+
+Put them into this folder inside your vault:
+
+```text
+.obsidian/plugins/obs-paysee/
 ```
 
-| 字段 | 类型 | 说明 |
-|------|------|------|
-| `date` | `YYYY-MM-DD` | 账单日期 |
-| `amount` | 数字 | 金额（正数） |
-| `category` | 字符串 | 分类名称 |
-| `type` | `income` / `expense` | 收入或支出 |
-| 正文 | 文本 | 备注（可选） |
+Do not put them into `.obsidian/snippets/`.
+That folder is only for CSS snippets, not for community plugins.
 
-## 设置项
+After copying the files:
 
-| 设置 | 默认值 | 说明 |
-|------|--------|------|
-| 账单存储路径 | `PaySee` | vault 中存放账单笔记的文件夹 |
-| 货币符号 | `¥` | 显示在金额前的符号 |
-| 分类列表 | 餐饮、交通、购物、娱乐、居住、医疗、教育、工资、其他 | 支持新增、删除、排序 |
+1. Open Obsidian.
+2. Go to `Settings -> Community plugins`.
+3. Reload or enable `PaySee`.
 
-## 开发
+## Usage
+
+1. Run the command `Add bill`, or click the ribbon icon.
+2. Enter the date, type, amount, category, and optional note.
+3. Open the PaySee panel to review the current month.
+4. Click a bill row to edit or delete it.
+
+## Keyboard Shortcuts
+
+In the new-bill modal opened from the `Add bill` command:
+
+- `ArrowLeft` / `ArrowRight` on the date field subtracts or adds one day
+- `ArrowUp` / `ArrowDown` moves focus between date, type, amount, category, and note
+- `Enter` saves the bill from any field, including the note textarea
+- `Shift+Enter` inserts a newline inside the note textarea
+
+## Storage
+
+New bills are stored under the plugin config directory as monthly JSON shards:
+
+```text
+.obsidian/plugins/obs-paysee/bills/YYYY-MM.json
+```
+
+Legacy Markdown bills from the configured bill folder can be migrated automatically.
+Backups of migrated legacy files are stored under:
+
+```text
+.obsidian/plugin-backups/
+```
+
+## Settings
+
+- `Legacy Markdown Folder`: source folder used only for importing and backing up old bill notes
+- `Currency Symbol`: prefix displayed before amounts
+- `Categories`: list used by the bill entry form
+
+## Development
 
 ```bash
-# 安装依赖
 npm install
-
-# 开发模式（watch）
 npm run dev
-
-# 生产构建
 npm run build
 ```
 
-构建产物为根目录下的 `main.js`。将项目文件夹放入 vault 的 `.obsidian/plugins/obs-paysee/` 即可加载。
+`npm run build` writes the production bundle to `main.js` in the project root.
 
-## 技术栈
+## File Layout
 
-- TypeScript + esbuild
-- Obsidian Plugin API (≥1.5.0)
-- Chart.js 4.x（环形图 & 柱状图）
+```text
+src/
+main.js
+manifest.json
+styles.css
+README.md
+```
 
-## 许可证
+## License
 
 MIT
